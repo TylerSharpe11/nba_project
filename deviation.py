@@ -4,8 +4,9 @@ import pandas as pd
 
 def fetch_and_compare_player_stats(player_full_name, team_full_name, season='2023', threshold=28, compare_stat='PTS'):
     # Validate compare_stat
-    if compare_stat not in ['PTS', 'AST']:
-        print("Invalid compare_stat. Please use 'PTS' for points or 'AST' for assists.")
+    valid_stats = ['PTS', 'AST', 'REB', 'FG3M']
+    if compare_stat not in valid_stats:
+        print(f"Invalid compare_stat. Please use one of the following: {', '.join(valid_stats)}.")
         return
     
     # Get player ID and team ID
@@ -35,7 +36,7 @@ def fetch_and_compare_player_stats(player_full_name, team_full_name, season='202
         df_high_performance = df[df['Game_ID'].isin(high_performance_games)]
         avg_minutes_overall = df['MIN'].mean()
         if avg_minutes_overall < 15:
-            continue
+            continue        
         # Calculate averages and percentage changes
         stats = ['AST', 'REB', 'PTS', 'FG3M']
         avg_stats = {stat: df[stat].mean() for stat in stats}
@@ -47,14 +48,14 @@ def fetch_and_compare_player_stats(player_full_name, team_full_name, season='202
     player_avg_comparison = pd.DataFrame(player_data)
 
     # Display top 10 positive and negative percentage changes for each stat
-    stats = ['AST', 'REB', 'PTS', 'FG3M']
     for stat in stats:
         pct_change_col = f'% Change in {stat}'
-        print(f"Top 10 Positive Percentage Changes in {stat}:")
+        print(f"Top 10 Positive Percentage Changes in {stat} ({compare_stat} > {threshold}):")
         print(player_avg_comparison.sort_values(by=pct_change_col, ascending=False).head(10)[['Player Name', pct_change_col]])
-        print(f"\nTop 10 Negative Percentage Changes in {stat}:")
+        print(f"\nTop 10 Negative Percentage Changes in {stat} ({compare_stat} > {threshold}):")
         print(player_avg_comparison.sort_values(by=pct_change_col, ascending=True).head(10)[['Player Name', pct_change_col]])
         print("\n" + "-"*50 + "\n")
 
 # Example usage
-fetch_and_compare_player_stats('Jonathan Kuminga', 'Golden State Warriors', '2023', 24, 'PTS')
+fetch_and_compare_player_stats('Luka Doncic', 'Dallas Mavericks', '2023', 5, 'REB')
+
